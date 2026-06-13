@@ -1,29 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner";
+import { DenunciaProvider, useDenuncia } from "@/lib/denuncia-store";
+import { Header } from "@/components/denuncia/Header";
+import { CitizenApp } from "@/components/denuncia/CitizenApp";
+import { OperatorView } from "@/components/denuncia/OperatorView";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Denuncia360 · Plataforma ciudadana de denuncias" },
+      { name: "description", content: "Registre, siga y reciba acompañamiento sobre denuncias por robo y hurto en Perú con apoyo de IA." },
+      { property: "og:title", content: "Denuncia360" },
+      { property: "og:description", content: "Plataforma digital de denuncias ciudadanas asistidas por IA." },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <DenunciaProvider>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <RoleSwitcher />
+        <Toaster richColors position="top-right" />
+      </div>
+    </DenunciaProvider>
   );
+}
+
+function RoleSwitcher() {
+  const { role } = useDenuncia();
+  return role === "ciudadano" ? <CitizenApp /> : <OperatorView />;
 }
