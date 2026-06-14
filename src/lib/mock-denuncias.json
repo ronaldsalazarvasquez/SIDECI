@@ -17,7 +17,7 @@
     "testigos": [{ "nombre": "María López", "contacto": "+51 987 654 321" }],
     "timeline": [
       { "key": "registro", "label": "Registro", "status": "completado", "fecha": "Hoy 10:12", "detalle": "Denuncia recibida en el sistema." },
-      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "Hoy 10:18", "detalle": "Datos validados por operador." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "Hoy 10:18", "detalle": "Datos validados por el Instructor PNP a cargo." },
       { "key": "asignacion", "label": "Asignación", "status": "en_proceso", "fecha": "Hoy 10:25", "detalle": "Asignando a comisaría jurisdiccional." },
       { "key": "revision", "label": "En revisión", "status": "pendiente" },
       { "key": "investigacion", "label": "Investigación", "status": "pendiente" },
@@ -45,7 +45,7 @@
     "testigos": [],
     "timeline": [
       { "key": "registro", "label": "Registro", "status": "completado", "fecha": "Ayer 18:40", "detalle": "Denuncia recibida en el sistema." },
-      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "Ayer 19:15", "detalle": "Datos validados por operador." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "Ayer 19:15", "detalle": "Datos validados por el Instructor PNP a cargo." },
       { "key": "asignacion", "label": "Asignación", "status": "completado", "fecha": "Ayer 19:40", "detalle": "Asignado a Comisaría Jesús María." },
       { "key": "revision", "label": "En revisión", "status": "en_proceso", "fecha": "Hoy 08:30", "detalle": "Expediente en revisión por el instructor técnico." },
       { "key": "investigacion", "label": "Investigación", "status": "pendiente" },
@@ -70,7 +70,7 @@
     "testigos": [],
     "timeline": [
       { "key": "registro", "label": "Registro", "status": "completado", "fecha": "10 de Junio", "detalle": "Denuncia recibida en el sistema." },
-      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "10 de Junio", "detalle": "Datos validados por operador." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "10 de Junio", "detalle": "Datos validados por el Instructor PNP a cargo." },
       { "key": "asignacion", "label": "Asignación", "status": "completado", "fecha": "11 de Junio", "detalle": "Asignado a Comisaría San Isidro." },
       { "key": "revision", "label": "En revisión", "status": "completado", "fecha": "12 de Junio", "detalle": "Expediente aprobado y calificado." },
       { "key": "investigacion", "label": "Investigación", "status": "en_proceso", "fecha": "12 de Junio", "detalle": "Pesquisa de cámaras de seguridad en paradero." },
@@ -78,6 +78,87 @@
     ],
     "mensajes": [
       { "id": "m5", "autor": "sistema", "texto": "Denuncia registrada correctamente.", "fecha": "10 de Junio" }
+    ]
+  },
+  {
+    "id": "d-2026-001242",
+    "expediente": "2026-001242",
+    "tipo": "Hurto agravado de celular",
+    "relato": "Fui víctima de arrebato de mi teléfono celular mientras caminaba por la Plaza de Armas de Arequipa.",
+    "relatoEstructurado": "El denunciante refiere haber sido víctima del arrebato de su equipo celular marca iPhone 14 Pro por parte de un sujeto que huyó a bordo de una motocicleta sin placa, en las inmediaciones de la Plaza de Armas del departamento de Arequipa.",
+    "agravantes": ["Vía pública", "Uso de vehículo motorizado"],
+    "dni": "70456123",
+    "imei": "358741096541235",
+    "ubicacion": { "lat": -16.3989, "lng": -71.5369, "direccion": "Calle Portal de Flores 120, Plaza de Armas, Arequipa" },
+    "fechaHecho": "2026-06-08 15:40",
+    "evidencias": [
+      { "id": "e4", "tipo": "foto", "nombre": "captura_sospechoso.jpg" }
+    ],
+    "testigos": [],
+    "timeline": [
+      { "key": "registro", "label": "Registro", "status": "completado", "fecha": "08 de Junio", "detalle": "Denuncia recibida en el sistema." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "08 de Junio", "detalle": "Datos validados por el Instructor PNP a cargo." },
+      { "key": "asignacion", "label": "Asignación", "status": "completado", "fecha": "09 de Junio", "detalle": "Asignado a la Comisaría de Arequipa." },
+      { "key": "revision", "label": "En revisión", "status": "en_proceso", "fecha": "10 de Junio", "detalle": "En calificación por fiscalía de Arequipa." },
+      { "key": "investigacion", "label": "Investigación", "status": "pendiente" },
+      { "key": "resultado", "label": "Resultado final", "status": "pendiente" }
+    ],
+    "mensajes": [
+      { "id": "m6", "autor": "sistema", "texto": "Denuncia registrada correctamente.", "fecha": "08 de Junio" }
+    ]
+  },
+  {
+    "id": "d-2026-001241",
+    "expediente": "2026-001241",
+    "tipo": "Robo en vivienda",
+    "relato": "Ingresaron a mi domicilio en Cusco forzando la chapa de la puerta principal mientras no me encontraba.",
+    "relatoEstructurado": "Delincuentes no identificados ingresaron al inmueble del denunciante mediante fractura de la cerradura principal de la puerta, logrando sustraer una computadora portátil, dinero en efectivo por la suma de 2000 soles y objetos de valor.",
+    "agravantes": ["Fractura de puerta", "Lugar habitado"],
+    "dni": "70987456",
+    "ubicacion": { "lat": -13.5183, "lng": -71.9772, "direccion": "Av. El Sol 450, Cusco" },
+    "fechaHecho": "2026-06-05 20:00",
+    "evidencias": [
+      { "id": "e5", "tipo": "foto", "nombre": "chapa_forzada.jpg" },
+      { "id": "e6", "tipo": "documento", "nombre": "boleta_laptop.pdf" }
+    ],
+    "testigos": [{ "nombre": "Juan Quispe", "contacto": "+51 954 123 789" }],
+    "timeline": [
+      { "key": "registro", "label": "Registro", "status": "completado", "fecha": "06 de Junio", "detalle": "Denuncia recibida en el sistema." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "06 de Junio", "detalle": "Datos validados por el Instructor PNP a cargo." },
+      { "key": "asignacion", "label": "Asignación", "status": "completado", "fecha": "06 de Junio", "detalle": "Asignado a Comisaría Cusco Centro." },
+      { "key": "revision", "label": "En revisión", "status": "completado", "fecha": "07 de Junio", "detalle": "Aprobado por el fiscal de Cusco." },
+      { "key": "investigacion", "label": "Investigación", "status": "en_proceso", "fecha": "08 de Junio", "detalle": "Policía realiza inspección técnica criminalística." },
+      { "key": "resultado", "label": "Resultado final", "status": "pendiente" }
+    ],
+    "mensajes": [
+      { "id": "m7", "autor": "sistema", "texto": "Denuncia registrada correctamente.", "fecha": "06 de Junio" }
+    ]
+  },
+  {
+    "id": "d-2026-001240",
+    "expediente": "2026-001240",
+    "tipo": "Robo de vehículo",
+    "relato": "Se llevaron mi motocicleta que dejé estacionada en la calle en Trujillo, La Libertad.",
+    "relatoEstructurado": "Sujetos desconocidos hurtaron la motocicleta de marca Honda, modelo GL125, color negro, de placa 9876-TX, de propiedad del denunciante, la cual se encontraba estacionada en la vía pública frente a su centro laboral en Trujillo, La Libertad.",
+    "agravantes": ["Vía pública"],
+    "dni": "70321654",
+    "placa": "9876-TX",
+    "ubicacion": { "lat": -8.1118, "lng": -79.0287, "direccion": "Jr. Pizarro 480, Trujillo, La Libertad" },
+    "fechaHecho": "2026-06-03 10:00",
+    "evidencias": [
+      { "id": "e7", "tipo": "foto", "nombre": "tarjeta_propiedad.jpg" }
+    ],
+    "testigos": [],
+    "timeline": [
+      { "key": "registro", "label": "Registro", "status": "completado", "fecha": "03 de Junio", "detalle": "Denuncia recibida en el sistema." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "03 de Junio", "detalle": "Datos validados por el Instructor PNP a cargo." },
+      { "key": "asignacion", "label": "Asignación", "status": "completado", "fecha": "04 de Junio", "detalle": "Asignado a Comisaría de Ayacucho, Trujillo." },
+      { "key": "revision", "label": "En revisión", "status": "pendiente" },
+      { "key": "investigacion", "label": "Investigación", "status": "pendiente" },
+      { "key": "resultado", "label": "Resultado final", "status": "pendiente" }
+    ],
+    "mensajes": [
+      { "id": "m8", "autor": "sistema", "texto": "Denuncia registrada correctamente.", "fecha": "03 de Junio" }
     ]
   }
 ]

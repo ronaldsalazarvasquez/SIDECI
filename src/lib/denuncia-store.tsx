@@ -55,11 +55,15 @@ export interface Denuncia {
   archivado?: boolean;
   diasParaApelar?: number;
   narradorChat?: ChatMessage[];
+  reniecValidado?: boolean;
+  firmaDigitalCode?: string;
+  estadoActa?: "borrador" | "firmado";
 }
+
 
 const defaultTimeline = (): EstadoTimeline[] => [
   { key: "registro", label: "Registro", status: "completado", fecha: "Hoy 10:12", detalle: "Denuncia recibida en el sistema." },
-  { key: "validacion", label: "Validación", status: "completado", fecha: "Hoy 10:18", detalle: "Datos validados por operador." },
+  { key: "validacion", label: "Validación", status: "completado", fecha: "Hoy 10:18", detalle: "Datos validados por el Instructor PNP a cargo del expediente." },
   { key: "asignacion", label: "Asignación", status: "en_proceso", fecha: "Hoy 10:25", detalle: "Asignando a comisaría jurisdiccional." },
   { key: "revision", label: "En revisión", status: "pendiente" },
   { key: "investigacion", label: "Investigación", status: "pendiente" },
@@ -79,10 +83,7 @@ const seedDenuncia = (): Denuncia => ({
   placa: undefined,
   ubicacion: { lat: -12.0931, lng: -77.0465, direccion: "Av. Arequipa 2500, Lince, Lima" },
   fechaHecho: "2026-03-14 21:30",
-  evidencias: [
-    { id: "e1", tipo: "foto", nombre: "lugar_hechos.jpg" },
-    { id: "e2", tipo: "documento", nombre: "factura_celular.pdf" },
-  ],
+  evidencias: [],
   testigos: [{ nombre: "María López", contacto: "+51 987 654 321" }],
   timeline: defaultTimeline(),
   mensajes: [
@@ -110,7 +111,7 @@ interface Ctx {
   updateDenuncia: (patch: Partial<Denuncia>) => void;
   selectDenuncia: (id: string) => void;
   setEstado: (k: EstadoKey, status: EstadoStatus, detalle?: string) => void;
-  archivar: () => void;
+  archivar: (motivo?: string) => void;
   addMensaje: (m: Omit<Mensaje, "id" | "fecha">) => void;
   addEvidencia: (e: Omit<Evidencia, "id">) => void;
   denuncias: Denuncia[];
@@ -264,16 +265,22 @@ export function DenunciaProvider({ children }: { children: ReactNode }) {
       return updated;
     });
 
-  const archivar = () =>
+  const archivar = (motivo?: string) =>
     setDenuncia((d) => {
+      const razonTexto = motivo || "Archivado provisionalmente por falta de elementos de juicio.";
       const updated = {
         ...d,
         archivado: true,
         diasParaApelar: 5,
-        timeline: d.timeline.map((t) => (t.key === "resultado" ? { ...t, status: "archivado" as EstadoStatus, fecha: new Date().toLocaleString("es-PE"), detalle: "Archivado provisionalmente" } : t)),
+        timeline: d.timeline.map((t) => (t.key === "resultado" ? { ...t, status: "archivado" as EstadoStatus, fecha: new Date().toLocaleString("es-PE"), detalle: razonTexto } : t)),
         mensajes: [
           ...d.mensajes,
-          { id: `m-${Date.now()}`, autor: "sistema" as const, texto: "Su caso fue archivado provisionalmente. Tiene 5 días para presentar observaciones.", fecha: "Ahora" },
+          { 
+            id: `m-${Date.now()}`, 
+            autor: "sistema" as const, 
+            texto: `Su caso fue archivado provisionalmente. Motivo: ${razonTexto}. Tiene 5 días para presentar observaciones o apelaciones.`, 
+            fecha: "Ahora" 
+          },
         ],
       };
       setDenuncias((list) => list.map(item => item.id === d.id ? updated : item));
