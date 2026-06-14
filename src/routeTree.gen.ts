@@ -9,8 +9,50 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SoporteRouteImport } from './routes/soporte'
+import { Route as SeguimientoRouteImport } from './routes/seguimiento'
+import { Route as RegistroRouteImport } from './routes/registro'
+import { Route as NarradorRouteImport } from './routes/narrador'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DenunciasRouteImport } from './routes/denuncias'
+import { Route as ConfirmacionRouteImport } from './routes/confirmacion'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SoporteRoute = SoporteRouteImport.update({
+  id: '/soporte',
+  path: '/soporte',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeguimientoRoute = SeguimientoRouteImport.update({
+  id: '/seguimiento',
+  path: '/seguimiento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegistroRoute = RegistroRouteImport.update({
+  id: '/registro',
+  path: '/registro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NarradorRoute = NarradorRouteImport.update({
+  id: '/narrador',
+  path: '/narrador',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DenunciasRoute = DenunciasRouteImport.update({
+  id: '/denuncias',
+  path: '/denuncias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfirmacionRoute = ConfirmacionRouteImport.update({
+  id: '/confirmacion',
+  path: '/confirmacion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +61,130 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/confirmacion': typeof ConfirmacionRoute
+  '/denuncias': typeof DenunciasRoute
+  '/login': typeof LoginRoute
+  '/narrador': typeof NarradorRoute
+  '/registro': typeof RegistroRoute
+  '/seguimiento': typeof SeguimientoRoute
+  '/soporte': typeof SoporteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/confirmacion': typeof ConfirmacionRoute
+  '/denuncias': typeof DenunciasRoute
+  '/login': typeof LoginRoute
+  '/narrador': typeof NarradorRoute
+  '/registro': typeof RegistroRoute
+  '/seguimiento': typeof SeguimientoRoute
+  '/soporte': typeof SoporteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/confirmacion': typeof ConfirmacionRoute
+  '/denuncias': typeof DenunciasRoute
+  '/login': typeof LoginRoute
+  '/narrador': typeof NarradorRoute
+  '/registro': typeof RegistroRoute
+  '/seguimiento': typeof SeguimientoRoute
+  '/soporte': typeof SoporteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/confirmacion'
+    | '/denuncias'
+    | '/login'
+    | '/narrador'
+    | '/registro'
+    | '/seguimiento'
+    | '/soporte'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/confirmacion'
+    | '/denuncias'
+    | '/login'
+    | '/narrador'
+    | '/registro'
+    | '/seguimiento'
+    | '/soporte'
+  id:
+    | '__root__'
+    | '/'
+    | '/confirmacion'
+    | '/denuncias'
+    | '/login'
+    | '/narrador'
+    | '/registro'
+    | '/seguimiento'
+    | '/soporte'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ConfirmacionRoute: typeof ConfirmacionRoute
+  DenunciasRoute: typeof DenunciasRoute
+  LoginRoute: typeof LoginRoute
+  NarradorRoute: typeof NarradorRoute
+  RegistroRoute: typeof RegistroRoute
+  SeguimientoRoute: typeof SeguimientoRoute
+  SoporteRoute: typeof SoporteRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/soporte': {
+      id: '/soporte'
+      path: '/soporte'
+      fullPath: '/soporte'
+      preLoaderRoute: typeof SoporteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seguimiento': {
+      id: '/seguimiento'
+      path: '/seguimiento'
+      fullPath: '/seguimiento'
+      preLoaderRoute: typeof SeguimientoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/registro': {
+      id: '/registro'
+      path: '/registro'
+      fullPath: '/registro'
+      preLoaderRoute: typeof RegistroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/narrador': {
+      id: '/narrador'
+      path: '/narrador'
+      fullPath: '/narrador'
+      preLoaderRoute: typeof NarradorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/denuncias': {
+      id: '/denuncias'
+      path: '/denuncias'
+      fullPath: '/denuncias'
+      preLoaderRoute: typeof DenunciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confirmacion': {
+      id: '/confirmacion'
+      path: '/confirmacion'
+      fullPath: '/confirmacion'
+      preLoaderRoute: typeof ConfirmacionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,7 +197,24 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ConfirmacionRoute: ConfirmacionRoute,
+  DenunciasRoute: DenunciasRoute,
+  LoginRoute: LoginRoute,
+  NarradorRoute: NarradorRoute,
+  RegistroRoute: RegistroRoute,
+  SeguimientoRoute: SeguimientoRoute,
+  SoporteRoute: SoporteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

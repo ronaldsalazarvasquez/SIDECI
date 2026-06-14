@@ -1,23 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Image as ImageIcon, Video, AudioLines, FileText, MapPin, UserPlus, Trash2, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Image as ImageIcon, Video, AudioLines, FileText, MapPin, UserPlus, Trash2, ArrowRight, CheckCircle2, UploadCloud, Printer } from "lucide-react";
 import { useDenuncia } from "@/lib/denuncia-store";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export function Module3Registro() {
   const { denuncia, updateDenuncia, addEvidencia, setActiveModule } = useDenuncia();
-  const [tipo, setTipo] = useState("celular");
+  const [tipo, setTipo] = useState(denuncia.tipo || "celular");
   const [dni, setDni] = useState(denuncia.dni);
   const [imei, setImei] = useState(denuncia.imei ?? "");
   const [placa, setPlaca] = useState(denuncia.placa ?? "");
   const [direccion, setDireccion] = useState(denuncia.ubicacion.direccion);
   const [marker, setMarker] = useState({ x: 50, y: 55 });
   const [testigos, setTestigos] = useState(denuncia.testigos);
+  const [narrativa, setNarrativa] = useState(denuncia.relatoEstructurado || "");
+  const [showMap, setShowMap] = useState(false);
+  const [declarationOk, setDeclarationOk] = useState(false);
+
+  // Sync if type changes reactively
+  useEffect(() => {
+    if (denuncia.tipo) {
+      setTipo(denuncia.tipo);
+    }
+  }, [denuncia.tipo]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files);
+
+    files.forEach((file) => {
+      let tipo: "foto" | "video" | "audio" | "documento" = "documento";
+      const ext = file.name.split(".").pop()?.toLowerCase();
+      if (ext && ["jpg", "jpeg", "png", "webp", "gif"].includes(ext)) {
+        tipo = "foto";
+      } else if (ext && ["mp4", "mov", "avi", "mkv", "3gp"].includes(ext)) {
+        tipo = "video";
+      } else if (ext && ["mp3", "wav", "m4a", "ogg", "aac"].includes(ext)) {
+        tipo = "audio";
+      }
+
+      const fileUrl = tipo === "foto" ? URL.createObjectURL(file) : undefined;
+
+      addEvidencia({
+        tipo,
+        nombre: file.name,
+        url: fileUrl
+      });
+      toast.success(`Evidencia subida: ${file.name}`);
+    });
+  };
 
   const dniOk = /^\d{8}$/.test(dni);
   const imeiOk = tipo !== "celular" || /^\d{15}$/.test(imei);
@@ -50,55 +95,129 @@ export function Module3Registro() {
             {tipo === "vehiculo" && <ValidatedField label="Placa del vehículo" value={placa.toUpperCase()} onChange={(v) => setPlaca(v.toUpperCase())} ok={placaOk} hint="Ej. ABC-123" />}
           </div>
 
-          <section>
-            <Label className="mb-2 block">Evidencias adjuntas</Label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {[
-                { i: ImageIcon, l: "Foto", t: "foto" as const },
-                { i: Video, l: "Video", t: "video" as const },
-                { i: AudioLines, l: "Audio", t: "audio" as const },
-                { i: FileText, l: "Doc.", t: "documento" as const },
-              ].map((x) => (
-                <Button key={x.l} variant="outline" className="h-auto flex-col gap-1 py-4" onClick={() => { addEvidencia({ tipo: x.t, nombre: `${x.l}_${Date.now()}` }); toast.success(`${x.l} adjuntada`); }}>
-                  <x.i className="h-5 w-5 text-primary" />
-                  <span className="text-xs">{x.l}</span>
-                </Button>
-              ))}
+          <div className="space-y-2">
+            <Label>Declaración de los hechos estructurada por IA (Revisión/Edición)</Label>
+            <Textarea
+              rows={6}
+              value={narrativa}
+              onChange={(e) => setNarrativa(e.target.value)}
+              placeholder="La IA redactará tu relato estructurado aquí..."
+              className="text-xs leading-relaxed font-mono bg-slate-50/50"
+            />
+            <p className="text-[10px] text-muted-foreground">
+              Este texto formal fue compilado por el asistente de voz IA. Puedes modificarlo directamente si encuentras algún error o deseas añadir precisión antes de registrar.
+            </p>
+          </div>
+
+          <section className="space-y-2.5">
+            <Label className="block text-sm font-semibold text-primary-deep">Carga de Evidencias Digitales</Label>
+            <div
+              onClick={() => document.getElementById("file-upload-input-m3")?.click()}
+              className="border border-dashed border-slate-200 rounded-lg p-3 text-center cursor-pointer hover:bg-slate-50 hover:border-primary/50 transition-all flex items-center justify-center gap-2 group"
+            >
+              <UploadCloud className="h-4.5 w-4.5 text-slate-400 group-hover:text-primary transition-colors" />
+              <span className="text-xs font-semibold text-slate-700">Cargar fotos o evidencias digitales (Max 10MB)</span>
+              <input
+                id="file-upload-input-m3"
+                type="file"
+                multiple
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
-            {denuncia.evidencias.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
+
+            {/* List of uploaded files with real image preview */}
+            {denuncia.evidencias && denuncia.evidencias.length > 0 && (
+              <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 mt-1">
                 {denuncia.evidencias.map((e) => (
-                  <Badge key={e.id} variant="secondary" className="gap-1">
-                    <FileText className="h-3 w-3" /> {e.nombre}
-                  </Badge>
+                  <div key={e.id} className="relative flex flex-col border border-slate-200 rounded-lg p-1 bg-slate-50/50 hover:border-slate-300 transition-all text-xs group">
+                    <div className="w-full h-14 bg-slate-100 border rounded flex items-center justify-center relative overflow-hidden select-none mb-1">
+                      {e.tipo === "foto" ? (
+                        e.url ? (
+                          <img src={e.url} className="absolute inset-0 w-full h-full object-cover animate-fade-in" alt={e.nombre} />
+                        ) : (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                            <ImageIcon className="h-4.5 w-4.5" />
+                          </div>
+                        )
+                      ) : e.tipo === "video" ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                          <Video className="h-4.5 w-4.5" />
+                        </div>
+                      ) : e.tipo === "audio" ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                          <AudioLines className="h-4.5 w-4.5" />
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                          <FileText className="h-4.5 w-4.5" />
+                        </div>
+                      )}
+
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={(evt) => {
+                          evt.stopPropagation();
+                          updateDenuncia({
+                            evidencias: denuncia.evidencias.filter((x) => x.id !== e.id)
+                          });
+                          toast.success("Evidencia eliminada");
+                        }}
+                        className="absolute top-1 right-1 h-5 w-5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-2.5 w-2.5 text-white" />
+                      </Button>
+                    </div>
+                    <span className="truncate font-medium text-slate-700 text-[10px] px-0.5" title={e.nombre}>{e.nombre}</span>
+                  </div>
                 ))}
               </div>
             )}
           </section>
 
-          <section>
-            <Label className="mb-2 flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Ubicación del hecho</Label>
-            <Input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Dirección" />
-            <div
-              className="relative mt-2 h-56 cursor-crosshair overflow-hidden rounded-lg border bg-[linear-gradient(135deg,#dbeafe_0%,#e0f2fe_100%)]"
-              onClick={(e) => {
-                const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                setMarker({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
-              }}
-            >
-              <svg className="absolute inset-0 h-full w-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <g key={i}>
-                    <line x1={i * 10} y1="0" x2={i * 10} y2="100" stroke="#1e40af" strokeWidth="0.2" />
-                    <line x1="0" y1={i * 10} x2="100" y2={i * 10} stroke="#1e40af" strokeWidth="0.2" />
-                  </g>
-                ))}
-              </svg>
-              <div className="pointer-events-none absolute" style={{ left: `${marker.x}%`, top: `${marker.y}%`, transform: "translate(-50%, -100%)" }}>
-                <MapPin className="h-8 w-8 fill-destructive text-destructive drop-shadow" />
-              </div>
-              <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-white/90 px-2 py-1 text-xs">Click para marcar el punto exacto</div>
+          <section className="space-y-2">
+            <Label className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" /> Ubicación del hecho</Label>
+            <div className="flex gap-2">
+              <Input
+                value={direccion}
+                onChange={(e) => setDireccion(e.target.value)}
+                placeholder="Dirección o referencia exacta"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowMap(!showMap)}
+                className={`text-xs h-10 border-slate-200 shrink-0 ${showMap ? "bg-slate-100 text-slate-800 font-semibold" : ""}`}
+              >
+                <MapPin className="mr-1 h-3.5 w-3.5 text-primary" />
+                {showMap ? "Ocultar Mapa" : "Ver Mapa"}
+              </Button>
             </div>
+            {showMap && (
+              <div
+                className="relative h-44 cursor-crosshair overflow-hidden rounded-lg border bg-[linear-gradient(135deg,#dbeafe_0%,#e0f2fe_100%)] animate-fade-in"
+                onClick={(e) => {
+                  const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                  setMarker({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
+                }}
+              >
+                <svg className="absolute inset-0 h-full w-full opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
+                  {Array.from({ length: 10 }).map((_, i) => (
+                    <g key={i}>
+                      <line x1={i * 10} y1="0" x2={i * 10} y2="100" stroke="#1e40af" strokeWidth="0.2" />
+                      <line x1="0" y1={i * 10} x2="100" y2={i * 10} stroke="#1e40af" strokeWidth="0.2" />
+                    </g>
+                  ))}
+                </svg>
+                <div className="pointer-events-none absolute" style={{ left: `${marker.x}%`, top: `${marker.y}%`, transform: "translate(-50%, -100%)" }}>
+                  <MapPin className="h-8 w-8 fill-destructive text-destructive drop-shadow" />
+                </div>
+                <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-white/90 px-2 py-1 text-xs">Click para marcar el punto exacto</div>
+              </div>
+            )}
           </section>
 
           <section>
@@ -132,13 +251,311 @@ export function Module3Registro() {
           <Row label="Ubicación" v={direccion} />
           <Row label="Evidencias" v={`${denuncia.evidencias.length}`} />
           <Row label="Testigos" v={`${testigos.length}`} />
-          <Button
-            className="mt-4 w-full"
-            disabled={!formOk}
-            onClick={() => { updateDenuncia({ dni, imei, placa, ubicacion: { ...denuncia.ubicacion, direccion }, testigos: testigos.filter((t) => t.nombre) }); setActiveModule("confirmacion"); toast.success("Denuncia registrada"); }}
-          >
-            Confirmar y registrar <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="pt-3 space-y-2">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full flex items-center justify-center gap-1.5 text-xs h-9 border-police-green text-police-green hover:bg-police-green-soft">
+                  <FileText className="h-4 w-4" /> Vista Previa de Acta (PDF)
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-100 p-6">
+                <style>{`
+                  @media print {
+                    body * {
+                      visibility: hidden !important;
+                    }
+                    #acta-policial-preview, #acta-policial-preview * {
+                      visibility: visible !important;
+                    }
+                    #acta-policial-preview {
+                      position: absolute !important;
+                      left: 0 !important;
+                      top: 0 !important;
+                      width: 100% !important;
+                      border: none !important;
+                      box-shadow: none !important;
+                      padding: 0 !important;
+                      margin: 0 !important;
+                    }
+                  }
+                `}</style>
+                <div className="flex justify-between items-center mb-4 shrink-0">
+                  <h3 className="font-bold text-slate-800 text-lg">Borrador de Acta Policial (Vista Previa)</h3>
+                  <Button size="sm" onClick={() => window.print()} className="bg-primary text-white hover:bg-primary-deep">
+                    <Printer className="mr-1.5 h-4 w-4" /> Imprimir / Guardar PDF
+                  </Button>
+                </div>
+
+                {/* Printable Document Sheet */}
+                <div id="acta-policial-preview" className="bg-white border shadow-md p-8 font-serif text-slate-900 mx-auto text-xs leading-relaxed max-w-[800px] border-double border-4 border-slate-700">
+                  {/* Header */}
+                  <div className="flex items-center justify-between border-b pb-4 mb-6">
+                    <div className="text-left font-bold uppercase tracking-wider text-[8px] leading-tight">
+                      <p>Ministerio del Interior</p>
+                      <p>Policía Nacional del Perú</p>
+                      <p>Región Policial Lima</p>
+                      <p className="text-slate-500">División de Denuncias Digitales</p>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <svg viewBox="0 0 100 100" className="h-10 w-10 text-slate-700">
+                        <path d="M50 5 L85 20 V50 C85 75 50 95 50 95 C50 95 15 75 15 50 V20 L50 5 Z" fill="none" stroke="currentColor" strokeWidth="3" />
+                        <path d="M50 15 L75 27 V50 C75 68 50 83 50 83 C50 83 25 68 25 50 V27 L50 15 Z" fill="currentColor" opacity="0.2" />
+                        <circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M50 35 V65 M35 50 H65" stroke="currentColor" strokeWidth="1.5" />
+                      </svg>
+                      <span className="text-[7px] font-sans font-bold text-slate-600 mt-1">PATRIA - LEY - HONOR</span>
+                    </div>
+                    <div className="text-right font-mono text-[9px] leading-tight">
+                      <p className="font-bold">EXPEDIENTE N°:</p>
+                      <p className="text-sm font-bold text-primary-deep">{denuncia.expediente} (BORRADOR)</p>
+                      <p className="text-slate-400 mt-0.5">SISTEMA SIDECI-DIGITAL</p>
+                    </div>
+                  </div>
+
+                  <div className="text-center mb-6">
+                    <h2 className="text-sm font-bold underline uppercase tracking-widest">
+                      BORRADOR DE CERTIFICADO DE DENUNCIA DIGITAL
+                    </h2>
+                    <p className="text-[9px] text-slate-600 font-sans mt-0.5">
+                      Vista previa del acta redactada por IA - Edición en curso
+                    </p>
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="space-y-4">
+                    {/* Seccion 1 */}
+                    <div>
+                      <h3 className="font-bold uppercase border-b pb-0.5 mb-1.5 text-[9px]">I. DATOS DE LA EMISIÓN Y REGISTRO</h3>
+                      <table className="w-full text-left">
+                        <tbody>
+                          <tr>
+                            <td className="w-1/4 font-bold py-1">Fecha de Registro:</td>
+                            <td className="py-1">{new Date().toLocaleDateString("es-PE")} a las {new Date().toLocaleTimeString("es-PE")}</td>
+                            <td className="w-1/4 font-bold py-1">Código de Firma:</td>
+                            <td className="py-1 font-mono">PENDIENTE DE REGISTRO</td>
+                          </tr>
+                          <tr>
+                            <td className="font-bold py-1">Estado de Denuncia:</td>
+                            <td className="py-1"><span className="font-bold text-amber-600">EN EDICIÓN CIUDADANA</span></td>
+                            <td className="font-bold py-1">Validez:</td>
+                            <td className="py-1">Requiere confirmación final de registro</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Seccion 2 */}
+                    <div>
+                      <h3 className="font-bold uppercase border-b pb-0.5 mb-1.5 text-[9px]">II. DATOS DEL DENUNCIANTE</h3>
+                      <table className="w-full text-left">
+                        <tbody>
+                          <tr>
+                            <td className="w-1/4 font-bold py-1">Documento Nacional (DNI):</td>
+                            <td className="py-1 font-mono">{dni || "—"}</td>
+                            <td className="w-1/4 font-bold py-1">Nacionalidad:</td>
+                            <td className="py-1">Peruana</td>
+                          </tr>
+                          <tr>
+                            <td className="font-bold py-1">Condición:</td>
+                            <td className="py-1">Víctima / Agraviado</td>
+                            <td className="font-bold py-1">Domicilio Legal:</td>
+                            <td className="py-1">Lima Metropolitana, Perú</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Seccion 3 */}
+                    <div>
+                      <h3 className="font-bold uppercase border-b pb-0.5 mb-1.5 text-[9px]">III. HECHO DE DELITO CONTRA EL PATRIMONIO</h3>
+                      <table className="w-full text-left">
+                        <tbody>
+                          <tr>
+                            <td className="w-1/4 font-bold py-1">Presunto Delito:</td>
+                            <td className="py-1 font-bold text-slate-800 uppercase">
+                              {denuncia.agravantes && denuncia.agravantes.length > 0 ? "Robo Agravado" : "Hurto Simple"}
+                            </td>
+                            <td className="w-1/4 font-bold py-1">Base Legal:</td>
+                            <td className="py-1 font-sans">
+                              {denuncia.agravantes && denuncia.agravantes.length > 0 ? "Artículo 189 del Código Penal" : "Artículo 185 del Código Penal"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="font-bold py-1">Bien Afectado:</td>
+                            <td className="py-1 capitalize">{tipo}</td>
+                            <td className="font-bold py-1">Identificador Técnico:</td>
+                            <td className="py-1 font-mono">
+                              {tipo === "celular" ? `IMEI: ${imei}` : tipo === "vehiculo" ? `Placa: ${placa}` : "No Aplica"}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="font-bold py-1">Ubicación del Hecho:</td>
+                            <td className="py-1" colSpan={3}>{direccion || "—"}</td>
+                          </tr>
+                          <tr>
+                            <td className="font-bold py-1">Fecha/Hora del Hecho:</td>
+                            <td className="py-1" colSpan={3}>{denuncia.fechaHecho || "—"}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Seccion 4 */}
+                    <div>
+                      <h3 className="font-bold uppercase border-b pb-0.5 mb-1.5 text-[9px]">IV. CIRCUNSTANCIAS DE LOS HECHOS (DECLARACIÓN FORMAL EN REVISIÓN)</h3>
+                      <div className="bg-slate-50 border p-3 rounded text-[11px] leading-relaxed italic whitespace-pre-wrap font-sans text-slate-800">
+                        {narrativa || "—"}
+                      </div>
+                    </div>
+
+                    {/* Seccion 5 */}
+                    {denuncia.agravantes && denuncia.agravantes.length > 0 && (
+                      <div>
+                        <h3 className="font-bold uppercase border-b pb-0.5 mb-1.5 text-[9px]">V. CIRCUNSTANCIAS AGRAVANTES ESPECIFICADAS</h3>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {denuncia.agravantes.map((a) => (
+                            <span key={a} className="bg-slate-100 border text-slate-800 px-2 py-0.5 rounded text-[9px] font-sans font-bold">
+                              • {a}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Seccion 6 */}
+                    {((testigos && testigos.length > 0) || (denuncia.evidencias && denuncia.evidencias.length > 0)) && (
+                      <div>
+                        <h3 className="font-bold uppercase border-b pb-0.5 mb-1.5 text-[9px]">VI. TESTIGOS Y EVIDENCIAS</h3>
+                        <table className="w-full text-left">
+                          <tbody>
+                            {testigos && testigos.length > 0 && (
+                              <tr className="border-b border-slate-100">
+                                <td className="w-1/4 font-bold py-2 align-top">Testigos:</td>
+                                <td className="py-2" colSpan={3}>
+                                  {testigos.map((t, idx) => (
+                                    <div key={idx} className="font-sans text-[10px] text-slate-700">• {t.nombre} ({t.contacto})</div>
+                                  ))}
+                                </td>
+                              </tr>
+                            )}
+                            {denuncia.evidencias && denuncia.evidencias.length > 0 && (
+                              <tr>
+                                <td className="w-1/4 font-bold py-2 align-top">Archivos Adjuntos:</td>
+                                <td className="py-2 animate-fade-in" colSpan={3}>
+                                  <div className="grid grid-cols-2 gap-3 mt-1.5">
+                                    {denuncia.evidencias.map((e) => (
+                                      <div key={e.id} className="flex flex-col border border-slate-200 rounded p-2 bg-slate-50/50 max-w-[280px] shadow-sm hover:border-slate-300 transition-all">
+                                        {/* Mock Thumbnail Preview */}
+                                        <div className="w-full h-20 bg-slate-100 border rounded mb-1 flex items-center justify-center relative overflow-hidden select-none">
+                                          {e.tipo === "foto" ? (
+                                            e.url ? (
+                                              <img src={e.url} className="absolute inset-0 w-full h-full object-cover" alt={e.nombre} />
+                                            ) : (
+                                              <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                                                <ImageIcon className="h-7 w-7 text-slate-400 mb-0.5" />
+                                                <span className="text-[7px] text-slate-500 font-sans font-bold tracking-wider uppercase">EVIDENCIA FOTOGRÁFICA</span>
+                                                <span className="absolute bottom-1 right-1 text-[5px] bg-slate-700 text-white font-mono px-1 rounded">IMAGEN</span>
+                                              </div>
+                                            )
+                                          ) : e.tipo === "video" ? (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                                              <Video className="h-7 w-7 text-slate-400 mb-0.5" />
+                                              <span className="text-[7px] text-slate-500 font-sans font-bold tracking-wider uppercase">REGISTRO DE VIDEO</span>
+                                              <span className="absolute bottom-1 right-1 text-[5px] bg-slate-700 text-white font-mono px-1 rounded font-semibold">MULTIMEDIA</span>
+                                            </div>
+                                          ) : e.tipo === "audio" ? (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                                              <AudioLines className="h-7 w-7 text-slate-400 mb-0.5" />
+                                              <div className="flex items-center gap-0.5 h-2.5 mt-0.5">
+                                                <div className="w-0.5 bg-slate-400 h-1.5 rounded-full" />
+                                                <div className="w-0.5 bg-slate-400 h-2.5 rounded-full" />
+                                                <div className="w-0.5 bg-slate-400 h-1 rounded-full" />
+                                                <div className="w-0.5 bg-slate-400 h-2 rounded-full" />
+                                                <div className="w-0.5 bg-slate-400 h-3 rounded-full animate-bounce" />
+                                              </div>
+                                              <span className="absolute bottom-1 right-1 text-[5px] bg-slate-700 text-white font-mono px-1 rounded">GRABACIÓN</span>
+                                            </div>
+                                          ) : (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-500">
+                                              <FileText className="h-7 w-7 text-slate-400 mb-0.5" />
+                                              <span className="text-[7px] text-slate-500 font-sans font-bold tracking-wider uppercase">CONSTANCIA DIGITAL</span>
+                                              <span className="absolute bottom-1 right-1 text-[5px] bg-slate-700 text-white font-mono px-1 rounded">DOCUMENTO</span>
+                                            </div>
+                                          )}
+                                          <div className="absolute top-1 left-1 border border-police-green/30 bg-police-green-soft/50 text-police-green text-[5px] font-sans font-bold px-1 rounded">
+                                            PNP EVIDENCIA
+                                          </div>
+                                        </div>
+                                        <div className="text-[9px] font-sans truncate text-slate-700 font-semibold leading-tight">{e.nombre}</div>
+                                        <div className="text-[6px] font-mono text-slate-400 mt-0.5 flex justify-between uppercase">
+                                          <span>Código: {e.id.substring(0, 8)}</span>
+                                          <span className="text-police-green font-bold">INTEGRIDAD: OK</span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* Seals and signatures */}
+                    <div className="pt-10 mt-8 grid grid-cols-2 text-center text-[9px] border-t">
+                      <div className="flex flex-col items-center">
+                        <div className="w-24 h-0.5 bg-slate-400 mb-1" />
+                        <p className="font-bold">CIUDADANO DENUNCIANTE</p>
+                        <p className="text-slate-500">DNI: {dni || "—"}</p>
+                        <p className="text-slate-400 text-[7px] leading-tight">Firma y huella digital en línea (Ley N° 29733)</p>
+                      </div>
+                      <div className="flex flex-col items-center font-mono text-slate-700">
+                        <div className="border border-slate-600 px-2.5 py-0.5 rounded text-[7px] mb-1 inline-block uppercase leading-tight bg-slate-50/50">
+                          <p className="font-bold text-[8px]">SIDECI DIGITAL</p>
+                          <p>PREVIO DE DOCUMENTO</p>
+                          <p className="font-bold">PNP - PERÚ</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Sworn Declaration Checkbox */}
+            <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/40 p-3.5 text-xs text-amber-900 shadow-sm mb-4">
+              <Checkbox
+                id="declaration"
+                checked={declarationOk}
+                onCheckedChange={(v) => setDeclarationOk(!!v)}
+                className="mt-0.5 border-amber-400 data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
+              />
+              <label htmlFor="declaration" className="cursor-pointer leading-relaxed select-none">
+                <strong>Declaración Jurada de Veracidad:</strong> Declaro bajo juramento que los hechos expuestos son verídicos, asumiendo la responsabilidad legal conforme al Art. 411 del Código Penal (Falsa declaración en procedimiento administrativo) y la Ley N° 32332.
+              </label>
+            </div>
+
+            <Button
+              className="w-full"
+              disabled={!formOk || !declarationOk}
+              onClick={() => {
+                updateDenuncia({
+                  tipo,
+                  dni,
+                  imei: tipo === "celular" ? imei : "",
+                  placa: tipo === "vehiculo" ? placa : "",
+                  relatoEstructurado: narrativa,
+                  ubicacion: { ...denuncia.ubicacion, direccion },
+                  testigos: testigos.filter((t) => t.nombre)
+                });
+                setActiveModule("confirmacion");
+                toast.success("Denuncia registrada correctamente");
+              }}
+            >
+              Confirmar y registrar <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

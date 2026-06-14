@@ -3,12 +3,9 @@ import { ClipboardCheck, Mic, FileText, BadgeCheck, Activity, MessagesSquare, Ch
 import { cn } from "@/lib/utils";
 
 const steps: { key: ModuleKey; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
-  { key: "preparacion", label: "Preparación", icon: ClipboardCheck },
   { key: "narrador", label: "Narrador IA", icon: Mic },
   { key: "registro", label: "Registro", icon: FileText },
   { key: "confirmacion", label: "Confirmación", icon: BadgeCheck },
-  { key: "seguimiento", label: "Seguimiento", icon: Activity },
-  { key: "soporte", label: "Soporte", icon: MessagesSquare },
 ];
 
 export function ModuleNav() {

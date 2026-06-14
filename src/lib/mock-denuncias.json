@@ -1,0 +1,83 @@
+[
+  {
+    "id": "d-2026-001245",
+    "expediente": "2026-001245",
+    "tipo": "Hurto agravado de celular",
+    "relato": "Me robaron el celular en la Av. Arequipa. Dos personas me interceptaron con un cuchillo.",
+    "relatoEstructurado": "El día de hoy, aproximadamente a las 21:30 hrs, en la Av. Arequipa cuadra 25, dos sujetos desconocidos se acercaron al denunciante y mediante amenaza con arma blanca le sustrajeron su teléfono celular marca Samsung.",
+    "agravantes": ["Nocturnidad", "Pluralidad de agentes", "Uso de arma blanca"],
+    "dni": "70123456",
+    "imei": "356938035643809",
+    "ubicacion": { "lat": -12.0931, "lng": -77.0465, "direccion": "Av. Arequipa 2500, Lince, Lima" },
+    "fechaHecho": "2026-06-13 21:30",
+    "evidencias": [
+      { "id": "e1", "tipo": "foto", "nombre": "lugar_hechos.jpg" },
+      { "id": "e2", "tipo": "documento", "nombre": "factura_celular.pdf" }
+    ],
+    "testigos": [{ "nombre": "María López", "contacto": "+51 987 654 321" }],
+    "timeline": [
+      { "key": "registro", "label": "Registro", "status": "completado", "fecha": "Hoy 10:12", "detalle": "Denuncia recibida en el sistema." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "Hoy 10:18", "detalle": "Datos validados por operador." },
+      { "key": "asignacion", "label": "Asignación", "status": "en_proceso", "fecha": "Hoy 10:25", "detalle": "Asignando a comisaría jurisdiccional." },
+      { "key": "revision", "label": "En revisión", "status": "pendiente" },
+      { "key": "investigacion", "label": "Investigación", "status": "pendiente" },
+      { "key": "resultado", "label": "Resultado final", "status": "pendiente" }
+    ],
+    "mensajes": [
+      { "id": "m1", "autor": "sistema", "texto": "Denuncia registrada correctamente.", "fecha": "Hoy 10:12" },
+      { "id": "m2", "autor": "pnp", "texto": "Su caso ha sido recibido. En breve será asignado.", "fecha": "Hoy 10:20" }
+    ]
+  },
+  {
+    "id": "d-2026-001244",
+    "expediente": "2026-001244",
+    "tipo": "Robo de vehículo",
+    "relato": "Estacioné mi auto en la Av. Brasil y al regresar ya no estaba.",
+    "relatoEstructurado": "El denunciante refiere haber dejado su auto marca Toyota color gris con placa A1B-234 estacionado frente a la Av. Brasil cuadra 15, percatándose posteriormente que había sido hurtado por autores desconocidos.",
+    "agravantes": ["Vía pública"],
+    "dni": "70123456",
+    "placa": "A1B-234",
+    "ubicacion": { "lat": -12.0792, "lng": -77.0495, "direccion": "Av. Brasil 1500, Jesús María, Lima" },
+    "fechaHecho": "2026-06-12 18:00",
+    "evidencias": [
+      { "id": "e3", "tipo": "foto", "nombre": "boleta_vehiculo.jpg" }
+    ],
+    "testigos": [],
+    "timeline": [
+      { "key": "registro", "label": "Registro", "status": "completado", "fecha": "Ayer 18:40", "detalle": "Denuncia recibida en el sistema." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "Ayer 19:15", "detalle": "Datos validados por operador." },
+      { "key": "asignacion", "label": "Asignación", "status": "completado", "fecha": "Ayer 19:40", "detalle": "Asignado a Comisaría Jesús María." },
+      { "key": "revision", "label": "En revisión", "status": "en_proceso", "fecha": "Hoy 08:30", "detalle": "Expediente en revisión por el instructor técnico." },
+      { "key": "investigacion", "label": "Investigación", "status": "pendiente" },
+      { "key": "resultado", "label": "Resultado final", "status": "pendiente" }
+    ],
+    "mensajes": [
+      { "id": "m3", "autor": "sistema", "texto": "Denuncia registrada correctamente.", "fecha": "Ayer 18:40" },
+      { "id": "m4", "autor": "pnp", "texto": "Asignado a la Comisaría de Jesús María. Se iniciarán indagaciones en la zona.", "fecha": "Ayer 19:42" }
+    ]
+  },
+  {
+    "id": "d-2026-001243",
+    "expediente": "2026-001243",
+    "tipo": "Hurto en vía pública",
+    "relato": "Me sacaron la billetera del bolsillo en el transporte público.",
+    "relatoEstructurado": "El denunciante refiere haber sido víctima del hurto de su billetera conteniendo documentos personales y dinero en efectivo por la suma de 300 soles, en circunstancias que viajaba a bordo de una unidad de transporte público en el distrito de San Isidro.",
+    "agravantes": ["Destreza", "Vía pública"],
+    "dni": "70123456",
+    "ubicacion": { "lat": -12.0967, "lng": -77.0354, "direccion": "Av. Javier Prado, San Isidro, Lima" },
+    "fechaHecho": "2026-06-10 13:00",
+    "evidencias": [],
+    "testigos": [],
+    "timeline": [
+      { "key": "registro", "label": "Registro", "status": "completado", "fecha": "10 de Junio", "detalle": "Denuncia recibida en el sistema." },
+      { "key": "validacion", "label": "Validación", "status": "completado", "fecha": "10 de Junio", "detalle": "Datos validados por operador." },
+      { "key": "asignacion", "label": "Asignación", "status": "completado", "fecha": "11 de Junio", "detalle": "Asignado a Comisaría San Isidro." },
+      { "key": "revision", "label": "En revisión", "status": "completado", "fecha": "12 de Junio", "detalle": "Expediente aprobado y calificado." },
+      { "key": "investigacion", "label": "Investigación", "status": "en_proceso", "fecha": "12 de Junio", "detalle": "Pesquisa de cámaras de seguridad en paradero." },
+      { "key": "resultado", "label": "Resultado final", "status": "pendiente" }
+    ],
+    "mensajes": [
+      { "id": "m5", "autor": "sistema", "texto": "Denuncia registrada correctamente.", "fecha": "10 de Junio" }
+    ]
+  }
+]
