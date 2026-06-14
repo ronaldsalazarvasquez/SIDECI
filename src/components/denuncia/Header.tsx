@@ -27,7 +27,7 @@ export function Header() {
           <MininterLogo height="h-8" />
 
           {/* Separator and App Title */}
-          <div className="hidden xs:block h-6 w-px bg-slate-200 shrink-0" />
+          <div className="hidden sm:block h-6 w-px bg-slate-200 shrink-0" />
           
           <div className="min-w-0">
             <h1 className="text-sm font-black text-primary sm:text-base tracking-tight leading-none">SIDECI</h1>
@@ -39,9 +39,10 @@ export function Header() {
         {isLoggedIn ? (
           <div className="flex items-center gap-3">
             {role === "ciudadano" && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border bg-slate-50 text-xs font-semibold text-slate-700">
+              <div className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border bg-slate-50 text-xs font-semibold text-slate-700">
                 <User className="h-3.5 w-3.5 text-primary" />
-                <span className="hidden sm:inline">Ciudadano: DNI</span> {denuncia.dni || "70123456"}
+                <span className="hidden sm:inline">Ciudadano:</span>
+                <span className="hidden sm:inline font-mono">DNI {denuncia.dni || "70123456"}</span>
               </div>
             )}
             {role === "operador" && (

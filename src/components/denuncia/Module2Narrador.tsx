@@ -47,7 +47,7 @@ export function Module2Narrador() {
   const [showSettings, setShowSettings] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState(openaiApiKey);
   const [voiceSynthesisEnabled, setVoiceSynthesisEnabled] = useState(true);
-  const [premiumVoice, setPremiumVoice] = useState(true);
+  const [premiumVoice, setPremiumVoice] = useState(false);
   const [openaiVoice, setOpenaiVoice] = useState("nova");
   const [speaking, setSpeaking] = useState(false);
   const [textMode, setTextMode] = useState(false);
@@ -600,8 +600,7 @@ export function Module2Narrador() {
       <Card className="flex flex-col h-[740px] lg:col-span-3 border-primary/20 bg-card overflow-hidden shadow-md">
         <CardHeader className="flex flex-row items-center justify-between border-b bg-muted/30 py-3 px-4 shrink-0">
           <div className="flex items-center gap-2">
-            <Badge className="bg-primary-soft text-primary-deep hover:bg-primary-soft">Módulo 2</Badge>
-            <CardTitle className="text-base font-bold text-primary-deep flex items-center gap-1.5">
+            <CardTitle className="text-xs sm:text-sm font-bold text-primary-deep flex items-center gap-1.5">
               <Sparkles className="h-4 w-4 text-police-green" /> Asistente Conversacional IA
             </CardTitle>
             {speaking && (

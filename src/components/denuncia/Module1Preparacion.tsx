@@ -75,6 +75,7 @@ export function Module1Preparacion() {
       placa: "",
       ubicacion: { lat: -12.0931, lng: -77.0465, direccion: "" },
       fechaHecho: "",
+      evidencias: [],
       testigos: []
     });
 
@@ -111,14 +112,15 @@ export function Module1Preparacion() {
       </div>
 
       {/* Estadísticas de Impacto y Trazabilidad (Insight 1: Demostrar Utilidad y Reducir Fricción) */}
-      <div className="grid gap-3 grid-cols-3">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
         <div className="flex items-center gap-2.5 p-3 rounded-xl border bg-white shadow-xs">
           <div className="p-2 rounded-lg bg-police-green-soft text-police-green shrink-0">
             <Clock className="h-4 w-4" />
           </div>
           <div>
-            <span className="block text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Espera Promedio</span>
-            <span className="block text-xs font-extrabold text-slate-800">8 Minutos <span className="text-[10px] text-muted-foreground font-normal">(vs. 3 hrs)</span></span>
+            <span className="block text-[8px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">Espera Promedio</span>
+            <span className="block text-xs font-extrabold text-slate-800">8 Minutos</span>
+            <span className="block text-[10px] text-muted-foreground font-normal mt-0.5">(vs. 3 hrs en comisaría)</span>
           </div>
         </div>
         <div className="flex items-center gap-2.5 p-3 rounded-xl border bg-white shadow-xs">
@@ -126,8 +128,9 @@ export function Module1Preparacion() {
             <ShieldCheck className="h-4 w-4" />
           </div>
           <div>
-            <span className="block text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Tasa de Registro</span>
-            <span className="block text-xs font-extrabold text-slate-800">98.4% <span className="text-[10px] text-muted-foreground font-normal">(vs. 50%)</span></span>
+            <span className="block text-[8px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">Tasa de Registro</span>
+            <span className="block text-xs font-extrabold text-slate-800">98.4%</span>
+            <span className="block text-[10px] text-muted-foreground font-normal mt-0.5">(vs. 50% tradicional)</span>
           </div>
         </div>
         <div className="flex items-center gap-2.5 p-3 rounded-xl border bg-white shadow-xs">
@@ -135,8 +138,9 @@ export function Module1Preparacion() {
             <Scale className="h-4 w-4" />
           </div>
           <div>
-            <span className="block text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Trazabilidad</span>
-            <span className="block text-xs font-extrabold text-slate-800">100% Digital <span className="text-[10px] text-muted-foreground font-normal">(SIDECI)</span></span>
+            <span className="block text-[8px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">Trazabilidad</span>
+            <span className="block text-xs font-extrabold text-slate-800">100% Digital</span>
+            <span className="block text-[10px] text-muted-foreground font-normal mt-0.5">(Portal SIDECI)</span>
           </div>
         </div>
       </div>

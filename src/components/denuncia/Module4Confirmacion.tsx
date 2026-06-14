@@ -15,6 +15,58 @@ import {
 export function Module4Confirmacion() {
   const { denuncia, setActiveModule } = useDenuncia();
 
+  const handlePrint = (elementId: string, title: string) => {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      toast.error("Por favor, permita las ventanas emergentes para imprimir");
+      return;
+    }
+    
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body {
+              background-color: white !important;
+              color: black !important;
+              padding: 40px !important;
+              font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+            }
+            #${elementId} {
+              border: double 4px #334155 !important;
+              box-shadow: none !important;
+              padding: 32px !important;
+              margin: 0 auto !important;
+              max-width: 800px !important;
+            }
+          </style>
+        </head>
+        <body>
+          ${element.outerHTML}
+        </body>
+      </html>
+    `);
+    
+    // Copy all style tags and stylesheets
+    document.querySelectorAll('style, link[rel="stylesheet"]').forEach((style) => {
+      printWindow.document.head.appendChild(style.cloneNode(true));
+    });
+    
+    printWindow.document.close();
+    
+    // Trigger print
+    printWindow.onload = () => {
+      setTimeout(() => {
+        printWindow.print();
+        printWindow.close();
+      }, 350);
+    };
+  };
+
   const shareUrl = typeof window !== "undefined"
     ? `${window.location.origin}${window.location.pathname}?expediente=${denuncia.expediente}`
     : "";
@@ -31,28 +83,45 @@ export function Module4Confirmacion() {
             <p className="mt-1 text-sm text-white/90">Evidencia inmediata para el ciudadano · Validez legal SIDECI</p>
           </div>
         </div>
-        <CardContent className="grid gap-6 p-6 md:grid-cols-[1fr_auto]">
-          <div className="space-y-4">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">N° de Expediente</p>
-              <p className="font-mono text-3xl font-bold text-primary-deep sm:text-4xl">N° {denuncia.expediente}</p>
-            </div>
+        <CardContent className="space-y-5 p-6">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">N° de Expediente</p>
+            <p className="font-mono text-3xl font-bold text-primary-deep sm:text-4xl">N° {denuncia.expediente}</p>
+          </div>
 
-            <Card className="border-primary/20 bg-primary-soft/30">
-              <CardContent className="space-y-2 p-4 text-sm">
-                <div className="mb-2 flex items-center gap-2 font-semibold text-primary-deep">
-                  <FileText className="h-4 w-4" /> Ficha técnica
+          <div className="grid gap-6 md:grid-cols-[1fr_auto] items-stretch">
+            <Card className="border-primary/20 bg-primary-soft/30 flex-grow">
+              <CardContent className="space-y-2 p-4 text-sm h-full flex flex-col justify-between">
+                <div>
+                  <div className="mb-2 flex items-center gap-2 font-semibold text-primary-deep">
+                    <FileText className="h-4 w-4" /> Ficha técnica
+                  </div>
+                  <Field k="Tipo" v={denuncia.tipo} />
+                  <Field k="Denunciante (DNI)" v={denuncia.dni} />
+                  <Field k="Lugar" v={denuncia.ubicacion.direccion} />
+                  <Field k="Fecha del hecho" v={denuncia.fechaHecho} />
+                  <Field k="Evidencias" v={`${denuncia.evidencias.length} archivos`} />
+                  <Field k="Agravantes detectados" v={denuncia.agravantes.join(", ") || "—"} />
+                  <Field k="Firma Digital" v={denuncia.firmaDigitalCode || "FIRM-DIG-PNP-" + denuncia.expediente} />
+                  <Field k="Validación Biométrica" v={denuncia.reniecValidado ? "Autenticado (RENIEC - ID Perú)" : "Verificación Local"} />
                 </div>
-                <Field k="Tipo" v={denuncia.tipo} />
-                <Field k="Denunciante (DNI)" v={denuncia.dni} />
-                <Field k="Lugar" v={denuncia.ubicacion.direccion} />
-                <Field k="Fecha del hecho" v={denuncia.fechaHecho} />
-                <Field k="Evidencias" v={`${denuncia.evidencias.length} archivos`} />
-                <Field k="Agravantes detectados" v={denuncia.agravantes.join(", ") || "—"} />
               </CardContent>
             </Card>
 
-            <div className="flex flex-wrap gap-2">
+            <Card className="border-slate-200 bg-white shadow-xs p-5 flex flex-col items-center justify-center gap-2.5 w-full md:w-56 shrink-0 rounded-xl">
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`}
+                alt="Código QR del expediente"
+                className="h-32 w-32 rounded-lg border bg-white p-1.5 shadow-sm"
+              />
+              <Badge variant="outline" className="border-police-green text-police-green text-[10px] uppercase font-bold tracking-wider">Código QR Oficial</Badge>
+              <p className="max-w-[11rem] text-center text-[10px] text-muted-foreground leading-normal">
+                Escanee este código para verificar la autenticidad del acta policial.
+              </p>
+            </Card>
+          </div>
+
+          <div className="flex flex-wrap gap-2.5 pt-2">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="bg-police-green text-white hover:bg-police-green/90">
@@ -60,35 +129,16 @@ export function Module4Confirmacion() {
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-100 p-6">
-                  <style>{`
-                    @media print {
-                      body * {
-                        visibility: hidden !important;
-                      }
-                      #acta-policial-documento, #acta-policial-documento * {
-                        visibility: visible !important;
-                      }
-                      #acta-policial-documento {
-                        position: absolute !important;
-                        left: 0 !important;
-                        top: 0 !important;
-                        width: 100% !important;
-                        border: none !important;
-                        box-shadow: none !important;
-                        padding: 0 !important;
-                        margin: 0 !important;
-                      }
-                    }
-                  `}</style>
                   <div className="flex justify-between items-center mb-4 shrink-0">
                     <h3 className="font-bold text-slate-800 text-lg">Acta de Denuncia Policial SIDECI</h3>
-                    <Button size="sm" onClick={() => window.print()} className="bg-primary text-white hover:bg-primary-deep">
+                    <Button size="sm" onClick={() => handlePrint("acta-policial-documento", "Acta de Denuncia Policial SIDECI")} className="bg-primary text-white hover:bg-primary-deep">
                       <Printer className="mr-1.5 h-4 w-4" /> Imprimir / Guardar PDF
                     </Button>
                   </div>
                   
                   {/* Printable Document Sheet */}
-                  <div id="acta-policial-documento" className="bg-white border shadow-md p-8 font-serif text-slate-900 mx-auto text-xs leading-relaxed max-w-[800px] border-double border-4 border-slate-700">
+                  <div className="w-full overflow-x-auto py-2">
+                    <div id="acta-policial-documento" className="bg-white border shadow-md p-4 sm:p-8 font-serif text-slate-900 mx-auto text-xs leading-relaxed max-w-[800px] min-w-[620px] sm:min-w-0 border-double border-4 border-slate-700">
                     {/* Header */}
                     <div className="flex items-center justify-between border-b pb-4 mb-6">
                       <div className="text-left font-bold uppercase tracking-wider text-[8px] leading-tight">
@@ -133,13 +183,21 @@ export function Module4Confirmacion() {
                               <td className="w-1/4 font-bold py-1">Fecha de Registro:</td>
                               <td className="py-1">{new Date().toLocaleDateString("es-PE")} a las {new Date().toLocaleTimeString("es-PE")}</td>
                               <td className="w-1/4 font-bold py-1">Código de Firma:</td>
-                              <td className="py-1 font-mono">FIRM-DIG-PNP-{denuncia.expediente}</td>
+                              <td className="py-1 font-mono text-[10px] text-police-green font-bold">
+                                {denuncia.firmaDigitalCode || `FIRM-DIG-PNP-${denuncia.expediente}`}
+                              </td>
                             </tr>
                             <tr>
                               <td className="font-bold py-1">Estado de Denuncia:</td>
-                              <td className="py-1"><span className="font-bold text-police-green">REGISTRADA EN SIDECI</span></td>
+                              <td className="py-1">
+                                <span className="font-bold text-police-green">
+                                  {denuncia.reniecValidado ? "ACTA OFICIAL FIRMADA DIGITALMENTE" : "REGISTRADA EN SIDECI"}
+                                </span>
+                              </td>
                               <td className="font-bold py-1">Validez:</td>
-                              <td className="py-1">Verificación por Código QR o Web PNP</td>
+                              <td className="py-1">
+                                {denuncia.reniecValidado ? "Verificación Biométrica ID Perú (RENIEC) - Plena Validez Legal" : "Verificación por Código QR o Web PNP"}
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -309,10 +367,23 @@ export function Module4Confirmacion() {
                       {/* Seals and signatures */}
                       <div className="pt-10 mt-8 grid grid-cols-3 text-center text-[9px] border-t items-center">
                         <div className="flex flex-col items-center">
-                          <div className="w-24 h-0.5 bg-slate-400 mb-1" />
-                          <p className="font-bold">CIUDADANO DENUNCIANTE</p>
-                          <p className="text-slate-500">DNI: {denuncia.dni}</p>
-                          <p className="text-slate-400 text-[7px] leading-tight">Firma y huella digital en línea (Ley N° 29733)</p>
+                          {denuncia.reniecValidado ? (
+                            <>
+                              <div className="border border-police-green bg-police-green-soft/30 text-police-green px-2.5 py-0.5 rounded text-[8px] font-mono mb-1 inline-block uppercase font-bold">
+                                ✔ FIRMADO CON ID PERÚ
+                              </div>
+                              <p className="font-bold">CIUDADANO DENUNCIANTE</p>
+                              <p className="text-slate-500 font-semibold">DNI: {denuncia.dni}</p>
+                              <p className="text-[6px] text-slate-400">Autenticado Biométricamente - RENIEC</p>
+                            </>
+                          ) : (
+                            <>
+                              <div className="w-24 h-0.5 bg-slate-400 mb-1" />
+                              <p className="font-bold">CIUDADANO DENUNCIANTE</p>
+                              <p className="text-slate-500">DNI: {denuncia.dni}</p>
+                              <p className="text-slate-400 text-[7px] leading-tight">Firma y huella digital en línea (Ley N° 29733)</p>
+                            </>
+                          )}
                         </div>
                         <div className="flex flex-col items-center">
                           <img 
@@ -323,18 +394,19 @@ export function Module4Confirmacion() {
                           <p className="text-[6px] font-sans font-bold text-slate-500 mt-1 uppercase tracking-wider">Escanear para Validar</p>
                         </div>
                         <div className="flex flex-col items-center">
-                          <div className="border border-slate-600 px-2.5 py-0.5 rounded text-slate-700 text-[7px] font-mono mb-1 inline-block uppercase leading-tight bg-slate-50/50">
+                          <div className={`border ${denuncia.reniecValidado ? "border-police-green text-police-green" : "border-slate-600 text-slate-700"} px-2.5 py-0.5 rounded text-[7px] font-mono mb-1 inline-block uppercase leading-tight bg-slate-50/50`}>
                             <p className="font-bold text-[8px]">SISTEMA DIGITAL SIDECI</p>
-                            <p>FIRMADO DIGITALMENTE</p>
+                            <p>{denuncia.reniecValidado ? "FIRMA BIOMÉTRICA RENIEC" : "FIRMADO DIGITALMENTE"}</p>
                             <p className="font-bold">PNP - PERÚ</p>
                           </div>
                           <p className="font-bold">MINISTERIO DEL INTERIOR</p>
                           <p className="text-slate-500">Plataforma Denuncia Digital PNP</p>
                         </div>
                       </div>
-                    </div>
                   </div>
-                </DialogContent>
+                </div>
+              </div>
+            </DialogContent>
               </Dialog>
               <Button variant="outline" onClick={() => {
                 navigator.clipboard.writeText(shareUrl);
@@ -346,17 +418,6 @@ export function Module4Confirmacion() {
                 Ver seguimiento <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
-          </div>
-
-          <div className="flex flex-col items-center gap-2">
-            <img 
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}`}
-              alt="Código QR del expediente"
-              className="h-40 w-40 rounded-md border bg-white p-2 shadow-sm"
-            />
-            <Badge variant="outline" className="border-police-green text-police-green">Código QR del expediente</Badge>
-            <p className="max-w-[10rem] text-center text-xs text-muted-foreground">Escanee para validar el documento.</p>
-          </div>
         </CardContent>
       </Card>
     </div>

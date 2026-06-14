@@ -94,6 +94,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      {
+        rel: "icon",
+        type: "image/png",
+        href: "/escudo_peru.png",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -122,7 +127,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <DenunciaProvider>
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col w-full overflow-x-hidden">
           <Header />
           <div className="flex-grow">
             <Outlet />
