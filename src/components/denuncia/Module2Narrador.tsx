@@ -297,12 +297,16 @@ export function Module2Narrador() {
           }
         }
         
-        // If we got native speech recognition transcription, append to textMessage!
+        // If we got native speech recognition transcription, process it immediately!
         const nativeText = speechTranscriptRef.current.trim();
         if (nativeText) {
           toast.success("Dictado de voz completado");
-          setTextMessage((prev) => prev ? prev + " " + nativeText : nativeText);
-          setTextMode(true); // Switch to text mode so they can see, edit, and send when ready!
+          setProcessing(true);
+          try {
+            await processUserMessage(nativeText);
+          } finally {
+            setProcessing(false);
+          }
           return;
         }
 
@@ -402,8 +406,7 @@ export function Module2Narrador() {
       }
 
       toast.success("Transcripción Whisper completada");
-      setTextMessage((prev) => prev ? prev + " " + userText : userText);
-      setTextMode(true); // Switch to text mode so they can see, edit, and send when ready!
+      await processUserMessage(userText);
     } catch (err: any) {
       toast.dismiss("whisper-status");
       console.error(err);
