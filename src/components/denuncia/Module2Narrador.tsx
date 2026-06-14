@@ -297,16 +297,12 @@ export function Module2Narrador() {
           }
         }
         
-        // If we got native speech recognition transcription, process it immediately!
+        // If we got native speech recognition transcription, append to textMessage!
         const nativeText = speechTranscriptRef.current.trim();
         if (nativeText) {
           toast.success("Dictado de voz completado");
-          setProcessing(true);
-          try {
-            await processUserMessage(nativeText);
-          } finally {
-            setProcessing(false);
-          }
+          setTextMessage((prev) => prev ? prev + " " + nativeText : nativeText);
+          setTextMode(true); // Switch to text mode so they can see, edit, and send when ready!
           return;
         }
 
@@ -339,14 +335,14 @@ export function Module2Narrador() {
         recognition.onresult = (event: any) => {
           let interimTranscript = "";
           let finalTranscript = "";
-          for (let i = event.resultIndex; i < event.results.length; ++i) {
+          for (let i = 0; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
               finalTranscript += event.results[i][0].transcript;
             } else {
               interimTranscript += event.results[i][0].transcript;
             }
           }
-          const text = finalTranscript || interimTranscript;
+          const text = finalTranscript + interimTranscript;
           speechTranscriptRef.current = text;
           setSpeechTranscript(text);
         };
@@ -405,8 +401,9 @@ export function Module2Narrador() {
         return;
       }
 
-      toast.success("Transcripción completada");
-      await processUserMessage(userText);
+      toast.success("Transcripción Whisper completada");
+      setTextMessage((prev) => prev ? prev + " " + userText : userText);
+      setTextMode(true); // Switch to text mode so they can see, edit, and send when ready!
     } catch (err: any) {
       toast.dismiss("whisper-status");
       console.error(err);
@@ -764,29 +761,29 @@ export function Module2Narrador() {
                 </div>
               </div>
             ) : textMode ? (
-              <form onSubmit={handleTextSubmit} className="flex gap-2 items-center">
+              <form onSubmit={handleTextSubmit} className="flex gap-2 items-end">
                 <Button
                   type="button"
                   variant="outline"
                   size="icon"
                   title="Modo Voz"
                   onClick={() => setTextMode(false)}
-                  className="h-10 w-10 shrink-0 text-primary border-primary/30"
+                  className="h-10 w-10 shrink-0 text-primary border-primary/30 mb-0.5"
                 >
                   <Mic className="h-5 w-5" />
                 </Button>
-                <Input
+                <Textarea
                   value={textMessage}
                   onChange={(e) => setTextMessage(e.target.value)}
                   placeholder="Describe lo sucedido o responde a la pregunta..."
                   disabled={processing}
-                  className="h-10"
+                  className="min-h-[40px] max-h-[120px] resize-none py-2 text-xs"
                 />
                 <Button
                   type="submit"
                   size="icon"
                   disabled={!textMessage.trim() || processing}
-                  className="h-10 w-10 shrink-0 bg-police-green text-white hover:bg-police-green/90"
+                  className="h-10 w-10 shrink-0 bg-police-green text-white hover:bg-police-green/90 mb-0.5"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
