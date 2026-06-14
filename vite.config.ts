@@ -17,3 +17,4 @@ export default defineConfig({
   },
 });
 
+// Trigger redeploy to activate Cloudflare Pages environment variables
